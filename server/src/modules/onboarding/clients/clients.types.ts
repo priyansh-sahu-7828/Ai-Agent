@@ -1,3 +1,11 @@
+// {
+//   "company_name": "MedVitals Health Systems",
+//   "email": "onboarding@medvitalshealth.com",
+//   "industry": "Healthcare"
+// }   = example
+
+
+
 // src/modules/clients/clients.types.ts
 export type OnboardingStatus =
   | 'not_started'
