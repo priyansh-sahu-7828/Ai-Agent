@@ -13,10 +13,9 @@ class APIClient:
 
         self.timeout = 60.0
 
-
-    # -------------------------------------------------
-    # Generic GET
-    # -------------------------------------------------
+    # =================================================
+    # GENERIC GET
+    # =================================================
 
     async def get(
         self,
@@ -40,19 +39,19 @@ class APIClient:
         except httpx.HTTPStatusError as e:
 
             raise Exception(
-                f"HTTP Error: {e.response.status_code}"
+                f"GET HTTP Error: "
+                f"{e.response.status_code}"
             )
 
         except Exception as e:
 
             raise Exception(
-                f"API GET failed: {str(e)}"
+                f"GET API failed: {str(e)}"
             )
 
-
-    # -------------------------------------------------
-    # Generic POST
-    # -------------------------------------------------
+    # =================================================
+    # GENERIC POST
+    # =================================================
 
     async def post(
         self,
@@ -80,19 +79,19 @@ class APIClient:
         except httpx.HTTPStatusError as e:
 
             raise Exception(
-                f"HTTP Error: {e.response.status_code}"
+                f"POST HTTP Error: "
+                f"{e.response.status_code}"
             )
 
         except Exception as e:
 
             raise Exception(
-                f"API POST failed: {str(e)}"
+                f"POST API failed: {str(e)}"
             )
 
-
-    # -------------------------------------------------
-    # Generic PATCH
-    # -------------------------------------------------
+    # =================================================
+    # GENERIC PATCH
+    # =================================================
 
     async def patch(
         self,
@@ -120,19 +119,19 @@ class APIClient:
         except httpx.HTTPStatusError as e:
 
             raise Exception(
-                f"HTTP Error: {e.response.status_code}"
+                f"PATCH HTTP Error: "
+                f"{e.response.status_code}"
             )
 
         except Exception as e:
 
             raise Exception(
-                f"API PATCH failed: {str(e)}"
+                f"PATCH API failed: {str(e)}"
             )
 
-
-    # -------------------------------------------------
-    # Generic DELETE
-    # -------------------------------------------------
+    # =================================================
+    # GENERIC DELETE
+    # =================================================
 
     async def delete(
         self,
@@ -147,7 +146,9 @@ class APIClient:
                 timeout=self.timeout
             ) as client:
 
-                response = await client.delete(url)
+                response = await client.delete(
+                    url
+                )
 
                 response.raise_for_status()
 
@@ -156,11 +157,12 @@ class APIClient:
         except httpx.HTTPStatusError as e:
 
             raise Exception(
-                f"HTTP Error: {e.response.status_code}"
+                f"DELETE HTTP Error: "
+                f"{e.response.status_code}"
             )
 
         except Exception as e:
 
             raise Exception(
-                f"API DELETE failed: {str(e)}"
+                f"DELETE API failed: {str(e)}"
             )

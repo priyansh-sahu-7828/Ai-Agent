@@ -1,8 +1,13 @@
 import json
 import asyncio
+import httpx
 
 from app.services.pipeline.prompt_builder import (
     build_master_prompt
+)
+
+from app.core.api_client import (
+    APIClient
 )
 
 from app.services.file_processing.parser_routes import ParserRouter
@@ -175,6 +180,21 @@ async def run_extraction_pipeline(
         # =====================================================
         try:
             parsed = json.loads(cleaned)
+            
+            # =====================================================
+            # STORE FINAL STRUCTURED DATA
+            # =====================================================
+
+            api_client = APIClient()
+
+            await api_client.post(
+                endpoint="/final-structured",
+                payload={
+                    "client_id": client_id,
+                    "structured_data": parsed,
+                    "extraction_status": "completed"
+                }
+            )
 
             return {
                 "success": True,

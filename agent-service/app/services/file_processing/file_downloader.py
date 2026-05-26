@@ -3,7 +3,7 @@ from typing import Optional
 
 
 class FileDownloader:
-
+    
     @staticmethod
     async def download_file(url: str) -> Optional[bytes]:
         """

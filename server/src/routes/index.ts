@@ -11,6 +11,12 @@ from '../modules/onboarding/Raw Input/index.js';
 import { fieldSchemaController }
 from '../modules/onboarding/field-schema/index.js';
 
+import { finalStructuredController }
+from '../modules/agents/final-structured/index.js';
+
+import { whatsappController }
+from '../modules/onboarding/whatsapp/index.js';
+
 const router = Router();
 
 // ── clients ──────────────────────────────────────
@@ -35,5 +41,17 @@ router.get   ('/field-schemas/key/:fieldKey',   fieldSchemaController.getByKey);
 router.post  ('/field-schemas',                 fieldSchemaController.create);
 router.patch ('/field-schemas/:id',             fieldSchemaController.update);
 router.delete('/field-schemas/:id',             fieldSchemaController.remove);
+
+// ── Final-Structured Routes ──────────────────────────────────────
+router.post  ('/final-structured',              finalStructuredController.create);
+router.get   ('/final-structured/:clientId',    finalStructuredController.getByClientId);
+
+// ── WhatsApp Routes ──────────────────────────────────────
+router.post  ('/onboarding/whatsapp',                      whatsappController.create);
+router.get   ('/onboarding/whatsapp/client/:clientId',     whatsappController.getByClientId);
+router.get   ('/onboarding/whatsapp/phone/:phoneNumberId', whatsappController.getByPhoneNumberId);
+router.patch ('/onboarding/whatsapp/:id',                  whatsappController.update);
+router.delete('/onboarding/whatsapp/:id',                  whatsappController.delete);
+
 
 export default router;

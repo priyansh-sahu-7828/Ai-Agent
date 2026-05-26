@@ -1,50 +1,43 @@
 import json
-import google.generativeai as genai
+from google import genai
 
 from app.core.config import (
     GOOGLE_API_KEY,
     GEMINI_MODEL
 )
 
-# ---------------------------------------------------
-# Configure Gemini
-# ---------------------------------------------------
 
-genai.configure(
+# =====================================================
+# CONFIGURE GEMINI
+# =====================================================
+
+client = genai.Client(
     api_key=GOOGLE_API_KEY
 )
 
-model = genai.GenerativeModel(
-    GEMINI_MODEL
-)
 
-
-# ---------------------------------------------------
-# Common AI Call Function
-# ---------------------------------------------------
+# =====================================================
+# COMMON TEXT RESPONSE
+# =====================================================
 
 async def generate_response(
     prompt: str,
-    temperature: float = 0.2,
+    temperature: float = 0.3,
     max_output_tokens: int = 4096,
-) -> str:
-    
+):
+
     try:
-        enhanced_prompt = f"""
-            You must return ONLY valid JSON.
 
-            Do not add markdown.
-            Do not add explanation.
-            Do not wrap in ```json.
+        response = client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+            config={
 
-            {prompt}
-            """
+                "temperature":
+                    temperature,
 
-        response = model.generate_content(
-            enhanced_prompt,
-            generation_config={
-                "temperature": temperature,
-                "max_output_tokens": max_output_tokens,
+                "max_output_tokens":
+                    max_output_tokens
             }
         )
 
@@ -53,68 +46,126 @@ async def generate_response(
     except Exception as e:
 
         print(
-            "[LLM ERROR]",
+            "[GEMINI ERROR]",
             str(e)
         )
 
         raise Exception(
-            f"LLM generation failed: {str(e)}"
+            f"Gemini generation failed: {str(e)}"
         )
 
 
-# ---------------------------------------------------
-# JSON Structured Output
-# ---------------------------------------------------
+# =====================================================
+# STRICT JSON RESPONSE
+# =====================================================
 
 async def generate_json_response(
     prompt: str,
     temperature: float = 0.1,
     max_output_tokens: int = 4096,
-) -> dict:
+):
 
     try:
 
         enhanced_prompt = f"""
-You must return ONLY valid JSON.
+You are a JSON generation engine.
 
-Do not add markdown.
-Do not add explanation.
-Do not wrap in ```json.
+Return ONLY valid JSON.
 
+STRICT RULES:
+- No markdown
+- No explanation
+- No extra text
+- No ```json
+- No comments
+- Only pure JSON object
+
+USER TASK:
 {prompt}
 """
 
-        response = model.generate_content(
-            enhanced_prompt,
-            generation_config={
-                "temperature": temperature,
-                "max_output_tokens": max_output_tokens,
-                "response_mime_type": "application/json",
+        response = client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=enhanced_prompt,
+
+            config={
+
+                "temperature":
+                    temperature,
+
+                "max_output_tokens":
+                    max_output_tokens,
+
+                "response_mime_type":
+                    "application/json"
             }
         )
 
         text = response.text.strip()
 
-        return json.loads(text)
+        parsed = json.loads(text)
+
+        return parsed
 
     except json.JSONDecodeError as e:
 
         print(
-            "[JSON PARSE ERROR]",
+            "[JSON ERROR]",
             str(e)
         )
 
         raise Exception(
-            "Invalid JSON returned from LLM"
+            "Invalid JSON returned by Gemini"
         )
 
     except Exception as e:
 
         print(
-            "[LLM ERROR]",
+            "[GEMINI ERROR]",
             str(e)
         )
 
         raise Exception(
-            f"LLM JSON generation failed: {str(e)}"
+            f"Gemini JSON generation failed: {str(e)}"
+        )
+
+
+# =====================================================
+# CHAT AGENT FUNCTION
+# =====================================================
+
+async def call_gemini(
+    system_prompt: str,
+    user_message: str
+):
+
+    try:
+
+        final_prompt = f"""
+SYSTEM:
+{system_prompt}
+
+USER:
+{user_message}
+"""
+
+        response = client.models.generate_content(
+
+            model=GEMINI_MODEL,
+            contents=final_prompt,
+
+            config={
+
+                "temperature": 0.7,
+
+                "max_output_tokens": 512
+            }
+        )
+
+        return response.text
+
+    except Exception as e:
+
+        raise Exception(
+            f"Gemini chat failed: {str(e)}"
         )
